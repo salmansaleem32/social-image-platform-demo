@@ -18,7 +18,7 @@ public class ImageGalleryViewModel : INotifyPropertyChanged
     VoteDataService _voteDataService;
 
     [Inject]
-    public void Construct (IImageVotingService imageService, IImageProviderService imageProviderService, VoteDataService voteDataService)
+    public void Construct(IImageVotingService imageService, IImageProviderService imageProviderService, VoteDataService voteDataService)
     {
         _imageService = imageService;
         _imageProviderService = imageProviderService;
@@ -82,9 +82,10 @@ public class ImageGalleryViewModel : INotifyPropertyChanged
 
     public async Task VoteForImageAsync(string imageId)
     {
+        Debug.Log($"Voting for image: {imageId}");
         try
         {
-            var updatedImage = _imageService.VoteAsync(imageId);
+            var updatedImage = await _imageService.VoteAsync(imageId);
 
             // Update local data
             var index = Images.FindIndex(img => img.imageId == imageId);

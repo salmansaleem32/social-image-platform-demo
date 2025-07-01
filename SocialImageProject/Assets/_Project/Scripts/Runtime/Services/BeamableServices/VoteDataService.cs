@@ -17,13 +17,14 @@ namespace Services
         private ICloudSavingService _cloudSavingService;
         private VoteData _voteData = new VoteData();
 
-        public Promise OnInstantiated(LightBeam ctx)
+        Promise ILightComponent.OnInstantiated(LightBeam beam)
         {
-            _ctx = ctx;
+            _ctx = beam;
             _cloudSavingService = _ctx.Scope.GetService<ICloudSavingService>();
+            Debug.Log($"VoteDataService instantiated with BeamContext: {beam.BeamContext}");
             LoadVotes(); // Load data on init
-            
-            return Promise.Success; 
+
+            return Promise.Success;
         }
 
         /// <summary>
@@ -35,6 +36,8 @@ namespace Services
                 _voteData.ImageVotes[imageId] = 0;
 
             _voteData.ImageVotes[imageId]++;
+
+            Debug.Log($"Vote added for image: {imageId}. New count: {_voteData.ImageVotes[imageId]}");
             await SaveVotes();
         }
 
@@ -48,8 +51,9 @@ namespace Services
             return 0;
         }
 
-        private async void LoadVotes()
+        public async Task<VoteData> LoadVotes()
         {
+            Debug.Log("Loading vote data...");
             var result = await _cloudSavingService.LoadData<VoteData>(SaveFileName);
             if (result != null)
             {
@@ -61,6 +65,8 @@ namespace Services
                 _voteData = new VoteData(); // start fresh
                 Debug.Log("No vote data found. Starting new.");
             }
+
+            return result;
         }
 
         private async Task SaveVotes()

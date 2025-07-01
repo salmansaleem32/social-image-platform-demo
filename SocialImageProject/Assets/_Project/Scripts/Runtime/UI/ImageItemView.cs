@@ -23,24 +23,16 @@ public class ImageItemView : MonoBehaviour, ILightComponent
     private LightBeam _ctx;
     private ICloudSavingService _cloudSavingService;
 
-    private string _playerId; 
-    
-    IImageVotingService _imageService;
+    private string _playerId;
 
-    [Inject]
-    public void Construct (IImageVotingService imageService)
-    {
-        _imageService = imageService;
-    }
-    
     public Promise OnInstantiated(LightBeam beam)
     {
         _ctx = beam;
         _playerId = _ctx.BeamContext.PlayerId.ToString();
-            
+
         return Promise.Success;
     }
-    
+
     public void Initialize(ImageData imageData, ImageGalleryViewModel viewModel)
     {
         _imageData = imageData;

@@ -1,4 +1,5 @@
 using Beamable;
+using Beamable.Runtime.LightBeams;
 using Services;
 using UnityEngine;
 using VContainer;
@@ -6,6 +7,9 @@ using VContainer.Unity;
 public class AppManager : LifetimeScope
 {
     [SerializeField] private ImageGalleryView imageGalleryView;
+    [SerializeField] private VoteDataService voteDataService;
+    [SerializeField] private CanvasGroup loadingBlocker;
+    [SerializeField] private RectTransform contentContainer;
 
     protected override void Configure(IContainerBuilder builder)
     {
@@ -18,17 +22,26 @@ public class AppManager : LifetimeScope
 
         // Register ViewModels
         builder.Register<ImageGalleryViewModel>(Lifetime.Singleton);
-        builder.RegisterComponentInHierarchy<VoteDataService>();
 
         // Register Views
         builder.RegisterComponent(imageGalleryView);
+        builder.RegisterComponent(voteDataService);
     }
 
-    private void Start()
+    private async void Start()
     {
         // Initialize views with their ViewModels
         var galleryViewModel = Container.Resolve<ImageGalleryViewModel>();
-        // var detailViewModel = Container.Resolve<ImageDetailViewModel>();
+
+        var beamContext = BeamContext.Default;
+        await beamContext.OnReady;
+
+        var lightBeam = await beamContext.CreateLightBeam(contentContainer, loadingBlocker, builder =>
+                {
+                    builder.AddLightComponent(voteDataService);
+                });
+
+        await lightBeam.Scope.Start<VoteDataService>();
 
         imageGalleryView.Initialize(galleryViewModel);
     }
