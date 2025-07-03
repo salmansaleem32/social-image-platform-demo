@@ -86,6 +86,76 @@ namespace Services
                     title = "Snowy Mountains",
                     imageUrl = "https://picsum.photos/400/300?random=10",
                     voteCount = 6
+                },
+                new ImageData
+                {
+                    imageId = "img11",
+                    title = "Sunrise Lake",
+                    imageUrl = "https://picsum.photos/400/300?random=11",
+                    voteCount = 10
+                },
+                new ImageData
+                {
+                    imageId = "img12",
+                    title = "Countryside Road",
+                    imageUrl = "https://picsum.photos/400/300?random=12",
+                    voteCount = 2
+                },
+                new ImageData
+                {
+                    imageId = "img13",
+                    title = "Autumn Leaves",
+                    imageUrl = "https://picsum.photos/400/300?random=13",
+                    voteCount = 13
+                },
+                new ImageData
+                {
+                    imageId = "img14",
+                    title = "Foggy Morning",
+                    imageUrl = "https://picsum.photos/400/300?random=14",
+                    voteCount = 5
+                },
+                new ImageData
+                {
+                    imageId = "img15",
+                    title = "River Rapids",
+                    imageUrl = "https://picsum.photos/400/300?random=15",
+                    voteCount = 8
+                },
+                new ImageData
+                {
+                    imageId = "img16",
+                    title = "Lavender Fields",
+                    imageUrl = "https://picsum.photos/400/300?random=16",
+                    voteCount = 7
+                },
+                new ImageData
+                {
+                    imageId = "img17",
+                    title = "Starry Night",
+                    imageUrl = "https://picsum.photos/400/300?random=17",
+                    voteCount = 14
+                },
+                new ImageData
+                {
+                    imageId = "img18",
+                    title = "Rainy Window",
+                    imageUrl = "https://picsum.photos/400/300?random=18",
+                    voteCount = 3
+                },
+                new ImageData
+                {
+                    imageId = "img19",
+                    title = "Vast Canyon",
+                    imageUrl = "https://picsum.photos/400/300?random=19",
+                    voteCount = 9
+                },
+                new ImageData
+                {
+                    imageId = "img20",
+                    title = "Cherry Blossoms",
+                    imageUrl = "https://picsum.photos/400/300?random=20",
+                    voteCount = 12
                 }
             };
 
