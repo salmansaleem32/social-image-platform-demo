@@ -41,6 +41,10 @@ public class AppManager : LifetimeScope
                     builder.AddLightComponent(voteDataService);
                 });
 
+                var containerBuilder = new ContainerBuilder();
+        containerBuilder.RegisterInstance(voteDataService);
+        containerBuilder.Build();
+
         await lightBeam.Scope.Start<VoteDataService>();
 
         imageGalleryView.Initialize(galleryViewModel);

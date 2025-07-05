@@ -80,7 +80,7 @@ public class ImageGalleryViewModel : INotifyPropertyChanged
         }
     }
 
-    public async Task VoteForImageAsync(string imageId)
+    public async Task VoteForImageAsync(ImageData imageId)
     {
         Debug.Log($"Voting for image: {imageId}");
         try
@@ -88,7 +88,7 @@ public class ImageGalleryViewModel : INotifyPropertyChanged
             var updatedImage = await _imageService.VoteAsync(imageId);
 
             // Update local data
-            var index = Images.FindIndex(img => img.imageId == imageId);
+            var index = Images.FindIndex(img => img.imageId == imageId.imageId);
             if (index >= 0)
             {
                 Images[index] = updatedImage;
@@ -98,7 +98,7 @@ public class ImageGalleryViewModel : INotifyPropertyChanged
         catch (Exception ex)
         {
             ErrorMessage = $"Failed to vote: {ex.Message}";
-            Debug.LogError(ex);
+            Debug.LogError(ErrorMessage);
         }
     }
 

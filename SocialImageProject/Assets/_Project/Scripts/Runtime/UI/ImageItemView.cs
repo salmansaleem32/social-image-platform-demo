@@ -52,7 +52,7 @@ public class ImageItemView : MonoBehaviour, ILightComponent
 
     private async void OnVoteClicked()
     {
-        await _viewModel.VoteForImageAsync(_imageData.imageId);
+        await _viewModel.VoteForImageAsync(_imageData);
         voteCountText.text = $"Votes: {_imageData.voteCount}";
     }
 

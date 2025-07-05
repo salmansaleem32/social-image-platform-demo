@@ -10,12 +10,10 @@ namespace Models
         public string imageUrl;
         public string title;
         public int voteCount;
-        public List<string> comments;
         public DateTime uploadDate;
 
         public ImageData()
         {
-            comments = new List<string>();
             uploadDate = DateTime.Now;
         }
     }

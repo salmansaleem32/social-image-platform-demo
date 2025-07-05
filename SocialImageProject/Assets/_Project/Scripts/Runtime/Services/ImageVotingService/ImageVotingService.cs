@@ -9,6 +9,7 @@ using Beamable.Player.CloudSaving;
 using Beamable.Runtime.LightBeams;
 using UnityEngine;
 using VContainer;
+using System.Threading;
 
 namespace Services
 {
@@ -27,12 +28,12 @@ namespace Services
             _voteDataService = voteDataService;
         }
 
-        public Task<ImageData> VoteAsync(string imageId)
+        public async Task<ImageData> VoteAsync(ImageData imageId)
         {
-            _voteDataService.AddVote(imageId);
-
+            var voteCount = await _voteDataService.AddVote(imageId.imageId);
+            imageId.voteCount = voteCount;
             Debug.Log($"Vote recorded for image: {imageId} by player: {_playerId}");
-            return Task.FromResult<ImageData>(null);
+            return imageId;
         }
 
         public Promise OnInstantiated(LightBeam beam)
