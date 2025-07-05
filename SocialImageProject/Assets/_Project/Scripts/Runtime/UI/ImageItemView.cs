@@ -16,6 +16,7 @@ public class ImageItemView : MonoBehaviour, ILightComponent
     [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private TextMeshProUGUI voteCountText;
     [SerializeField] private Button voteButton;
+    [SerializeField] private GameObject loadingObject;
 
     private ImageData _imageData;
     private ImageGalleryViewModel _viewModel;
@@ -23,24 +24,16 @@ public class ImageItemView : MonoBehaviour, ILightComponent
     private LightBeam _ctx;
     private ICloudSavingService _cloudSavingService;
 
-    private string _playerId; 
-    
-    IImageVotingService _imageService;
+    private string _playerId;
 
-    [Inject]
-    public void Construct (IImageVotingService imageService)
-    {
-        _imageService = imageService;
-    }
-    
     public Promise OnInstantiated(LightBeam beam)
     {
         _ctx = beam;
         _playerId = _ctx.BeamContext.PlayerId.ToString();
-            
+
         return Promise.Success;
     }
-    
+
     public void Initialize(ImageData imageData, ImageGalleryViewModel viewModel)
     {
         _imageData = imageData;
@@ -48,6 +41,8 @@ public class ImageItemView : MonoBehaviour, ILightComponent
 
         titleText.text = imageData.title;
         voteCountText.text = $"Votes: {imageData.voteCount}";
+
+        loadingObject.SetActive(true);
 
         voteButton.onClick.AddListener(OnVoteClicked);
 
@@ -57,7 +52,7 @@ public class ImageItemView : MonoBehaviour, ILightComponent
 
     private async void OnVoteClicked()
     {
-        await _viewModel.VoteForImageAsync(_imageData.imageId);
+        await _viewModel.VoteForImageAsync(_imageData);
         voteCountText.text = $"Votes: {_imageData.voteCount}";
     }
 
@@ -71,6 +66,8 @@ public class ImageItemView : MonoBehaviour, ILightComponent
             {
                 var texture = UnityEngine.Networking.DownloadHandlerTexture.GetContent(www);
                 imageDisplay.texture = texture;
+
+                loadingObject.SetActive(false);
             }
         }
     }

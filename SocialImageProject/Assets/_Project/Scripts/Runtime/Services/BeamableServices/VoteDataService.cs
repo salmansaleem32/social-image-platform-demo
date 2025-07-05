@@ -1,3 +1,4 @@
+using Beamable;
 using Beamable.Common;
 using Beamable.Player.CloudSaving;
 using Beamable.Runtime.LightBeams;
@@ -5,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using Newtonsoft.Json;
 
 namespace Services
 {
@@ -17,25 +19,30 @@ namespace Services
         private ICloudSavingService _cloudSavingService;
         private VoteData _voteData = new VoteData();
 
-        public Promise OnInstantiated(LightBeam ctx)
+        Promise ILightComponent.OnInstantiated(LightBeam beam)
         {
-            _ctx = ctx;
+            _ctx = beam;
             _cloudSavingService = _ctx.Scope.GetService<ICloudSavingService>();
-            LoadVotes(); // Load data on init
-            
-            return Promise.Success; 
+            Debug.Log($"VoteDataService instantiated with BeamContext: {beam.BeamContext}");
+            // LoadVotes(); // Load data on init
+
+            return Promise.Success;
         }
 
         /// <summary>
         /// Call this to increment the vote count for a given image ID.
         /// </summary>
-        public async void AddVote(string imageId)
+        public async Task<int> AddVote(string imageId)
         {
             if (!_voteData.ImageVotes.ContainsKey(imageId))
                 _voteData.ImageVotes[imageId] = 0;
 
             _voteData.ImageVotes[imageId]++;
+
+            Debug.Log($"Vote added for image: {imageId}. New count: {_voteData.ImageVotes[imageId]}");
             await SaveVotes();
+
+            return _voteData.ImageVotes[imageId];
         }
 
         /// <summary>
@@ -48,25 +55,84 @@ namespace Services
             return 0;
         }
 
-        private async void LoadVotes()
+        public async Task<VoteData> LoadVotes()
         {
-            var result = await _cloudSavingService.LoadData<VoteData>(SaveFileName);
+            Debug.Log("Loading vote data...");
+            _cloudSavingService = GetCloudSavingService();
+            await InitCloudSaving();
+
+            Debug.Log ("LocalDataFullPath : " + _cloudSavingService.LocalDataFullPath);
+
+            var resultString = await _cloudSavingService.LoadDataString(SaveFileName);
+            var result = JsonConvert.DeserializeObject<VoteData>(resultString);
             if (result != null)
             {
                 _voteData = result;
-                Debug.Log("Vote data loaded.");
+                Debug.Log("Vote data loaded." + 
+                          $"ImageVotes count: {_voteData.ImageVotes.Count}");
             }
             else
             {
                 _voteData = new VoteData(); // start fresh
                 Debug.Log("No vote data found. Starting new.");
             }
+
+            return result;
+        }
+
+        private async Task InitCloudSaving()
+        {
+            var beamContext = BeamContext.Default;
+            await beamContext.OnReady;
+
+            Debug.Log($"BeamContext ready: {beamContext.Api.User.id}");
+
+            await _cloudSavingService.Init(1);
+            Debug.Log("CloudSavingService initialized.");
         }
 
         private async Task SaveVotes()
         {
-            await _cloudSavingService.SaveData(SaveFileName, _voteData);
+            _cloudSavingService = GetCloudSavingService();
+            
+            var convertedData = JsonConvert.SerializeObject(_voteData);
+            await _cloudSavingService.SaveData(SaveFileName, convertedData);
             Debug.Log("Vote data saved.");
+        }
+
+        private ICloudSavingService GetCloudSavingService()
+        {
+            if (_ctx == null)
+            {
+                try
+                {
+                    return Beamable.BeamContext.Default.ServiceProvider.GetService<ICloudSavingService>();
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"Failed to get CloudSavingService from BeamContext: {ex.Message}");
+                    return null;
+                }
+            }
+
+            try
+            {
+                return _ctx.Scope.GetService<ICloudSavingService>();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"Failed to get CloudSavingService from LightBeam: {ex.Message}");
+                // Fallback: try to get from BeamContext
+                try
+                {
+                    return Beamable.BeamContext.Default.ServiceProvider.GetService<ICloudSavingService>();
+                }
+                catch (System.Exception ex2)
+                {
+                    Debug.LogError($"Failed to get CloudSavingService from BeamContext: {ex2.Message}");
+                    return null;
+                }
+            }
         }
 
         [Serializable]
@@ -74,6 +140,7 @@ namespace Services
         {
             public Dictionary<string, int> ImageVotes = new Dictionary<string, int>();
         }
+
     }
 
 }

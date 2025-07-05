@@ -6,6 +6,6 @@ namespace Services
 {
     public interface IImageVotingService : ILightComponent
     {
-        Task<ImageData> VoteAsync(string imageId);
+        Task<ImageData> VoteAsync(ImageData imageId);
     }
 }
